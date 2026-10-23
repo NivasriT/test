@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Management</title>
+<!-- BYTEXL: npm install; npm start; then open the ByteXL application URL.
+     Internet access is needed for CDN scripts. -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/react-router-dom@6.28.1/umd/react-router-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+body{font-family:Arial,sans-serif;margin:30px;background:#f3f6fa}
+.card{background:white;margin:12px 0;padding:15px;border-radius:8px}
+a{color:#075eaa;margin-right:15px}
+</style>
+</head>
+<body><div id="root"></div>
+<script type="text/babel">
+const {BrowserRouter,Routes,Route,Link,useParams}=ReactRouterDOM;
+function EventList(){
+ const [events,setEvents]=React.useState([]),[error,setError]=React.useState("");
+ React.useEffect(()=>{fetch("/api/events").then(r=>{if(!r.ok)throw new Error("Unable to load events");return r.json();}).then(setEvents).catch(e=>setError(e.message));},[]);
+ return <div><h2>Available Events</h2>{error&&<p>{error}</p>}
+ {events.map(event=><div className="card" key={event._id}><h3>{event.name}</h3><p>Date: {event.date}</p><Link to={"/events/"+event._id}>View Details</Link></div>)}
+ {events.length===0&&!error&&<p>No events available. Add an event to MongoDB.</p>}</div>;
+}
+function EventDetails(){
+ const {id}=useParams(),[event,setEvent]=React.useState(null),[error,setError]=React.useState("");
+ React.useEffect(()=>{fetch("/api/events/"+id).then(r=>{if(!r.ok)throw new Error("Event not found");return r.json();}).then(setEvent).catch(e=>setError(e.message));},[id]);
+ if(error)return <p>{error}</p>; if(!event)return <p>Loading event...</p>;
+ return <div className="card"><h2>{event.name}</h2><p>Date: {event.date}</p><p>Location: {event.location}</p><p>Description: {event.description}</p><Link to="/">Back to Events</Link></div>;
+}
+function App(){return <BrowserRouter><h1>Online Event Management</h1><nav><Link to="/">Event List</Link></nav><Routes><Route path="/" element={<EventList/>}/><Route path="/events/:id" element={<EventDetails/>}/></Routes></BrowserRouter>;}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>
