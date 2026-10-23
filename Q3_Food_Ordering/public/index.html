@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Ordering System</title>
+<!-- BYTEXL: Run npm install then npm start; open the provided application URL.
+     The useEffect message appears in the browser console. -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>body{font-family:Arial,sans-serif;margin:30px;background:#f3f6fa}.box{max-width:450px;padding:25px;margin:auto;background:white;border-radius:10px}button{padding:10px 15px;margin:5px;cursor:pointer}</style>
+</head>
+<body><div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect}=React;
+function Order({customerName,amount}){
+ const [total,setTotal]=useState(amount);
+ useEffect(()=>{console.log("Food Ordering System Loaded");},[]);
+ return <div className="box"><h2>Food Ordering System</h2><p>Customer Name: {customerName}</p><p>Order Amount: ₹{total}</p><button onClick={()=>setTotal(a=>a+100)}>Add ₹100</button><button onClick={()=>setTotal(amount)}>Reset</button></div>;
+}
+function App(){return <Order customerName="Priya" amount={1500}/>;}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>
