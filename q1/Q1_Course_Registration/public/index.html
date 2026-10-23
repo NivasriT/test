@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Registration</title>
+  <!-- BYTEXL: Run npm install, then npm start in the project root.
+       Open the URL supplied by ByteXL. Internet access is required for CDN scripts. -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body{font-family:Arial,sans-serif;margin:30px;background:#f2f5f9}
+    .box{max-width:500px;margin:auto;background:white;padding:25px;border-radius:10px}
+    input,select,button{display:block;width:100%;padding:10px;margin:10px 0;box-sizing:border-box}
+    button{background:#1769aa;color:white;border:0;cursor:pointer}
+    #message{white-space:pre-wrap}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState}=React;
+function App(){
+  const [form,setForm]=useState({name:"",email:"",username:"",password:"",course:"Full Stack Development"});
+  const [message,setMessage]=useState("");
+  function handleChange(e){setForm({...form,[e.target.name]:e.target.value});}
+  async function handleSubmit(e){
+    e.preventDefault();
+    if(!form.name.trim()||!form.email.trim()||!form.username.trim()||!form.password){setMessage("All fields are required");return;}
+    if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(form.email)){setMessage("Enter a valid email address");return;}
+    if(form.password.length<8){setMessage("Password must have at least 8 characters");return;}
+    try{
+      const response=await fetch("/api/registrations",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||"Registration failed");
+      setMessage(data.message);
+      setForm({name:"",email:"",username:"",password:"",course:"Full Stack Development"});
+    }catch(error){setMessage(error.message||"Server connection failed");}
+  }
+  return <div className="box"><h1>Course Registration</h1>
+    <form onSubmit={handleSubmit}>
+      <input name="name" placeholder="Student Name" value={form.name} onChange={handleChange} required/>
+      <input name="email" type="email" placeholder="Email ID" value={form.email} onChange={handleChange} required/>
+      <input name="username" placeholder="Username" value={form.username} onChange={handleChange} required/>
+      <input name="password" type="password" placeholder="Password (minimum 8 characters)" value={form.password} onChange={handleChange} minLength="8" required/>
+      <select name="course" value={form.course} onChange={handleChange}>
+        <option>Full Stack Development</option><option>Machine Learning</option><option>Cloud Computing</option>
+      </select>
+      <button type="submit">Register</button>
+    </form><p id="message">{message}</p>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
