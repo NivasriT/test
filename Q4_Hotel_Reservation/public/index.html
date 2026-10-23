@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Reservation Management</title>
+<!-- BYTEXL: Run npm install and npm start; open the ByteXL URL.
+     React Router navigates Home/Reservations. Internet access is needed for CDN scripts. -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/react-router-dom@6.28.1/umd/react-router-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>body{font-family:Arial,sans-serif;margin:30px;background:#f2f5f9}.box{background:white;max-width:600px;padding:20px;margin:15px 0;border-radius:8px}a{margin-right:20px;color:#075eaa}</style>
+</head>
+<body><div id="root"></div>
+<script type="text/babel">
+const {BrowserRouter,Routes,Route,Link}=ReactRouterDOM;
+function Home(){return <div className="box"><h2>Welcome to Our Hotel</h2><p>Hotel Reservation Management System</p><Link to="/reservations">View Reservations</Link></div>;}
+function Reservation({guestName,roomType}){
+ React.useEffect(()=>{console.log("Reservation Details Loaded");},[]);
+ return <div className="box"><h3>Reservation Details</h3><p>Guest Name: {guestName}</p><p>Room Type: {roomType}</p></div>;
+}
+function Reservations(){
+ const [reservations,setReservations]=React.useState([]),[error,setError]=React.useState("");
+ React.useEffect(()=>{fetch("/api/reservations").then(r=>{if(!r.ok)throw new Error("Unable to load reservations");return r.json();}).then(setReservations).catch(e=>setError(e.message));},[]);
+ return <div><h2>Hotel Reservations</h2>{error&&<p>{error}</p>}
+ {reservations.map(r=><div key={r._id}><Reservation guestName={r.guestName} roomType={r.roomType}/><p>Status: {r.status}</p><p>Reservation ID: {r.reservationId}</p></div>)}
+ {reservations.length===0&&!error&&<p>No reservations found.</p>}<Link to="/">Home</Link></div>;
+}
+function App(){return <BrowserRouter><h1>Hotel Reservation System</h1><nav><Link to="/">Home</Link><Link to="/reservations">Reservations</Link></nav><Routes><Route path="/" element={<Home/>}/><Route path="/reservations" element={<Reservations/>}/></Routes></BrowserRouter>;}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>
